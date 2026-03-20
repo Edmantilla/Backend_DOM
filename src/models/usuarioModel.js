@@ -1,7 +1,7 @@
 // Consultar todos los usuarios
 export const getAllUsuarios = async () => {
     try {
-        const respuesta = await fetch("https://jsonplaceholder.typicode.com/users");
+        const respuesta = await fetch("http://localhost:3000/usuarios");
         if (respuesta.ok) {
             return await respuesta.json();
         }
@@ -13,7 +13,7 @@ export const getAllUsuarios = async () => {
 // Consultar el usuario por ID
 export const getByIdUsuario = async (idUsuario) => {
     try {
-        const respuesta = await fetch(`https://jsonplaceholder.typicode.com/users/${idUsuario}`);
+        const respuesta = await fetch(`http://localhost:3000/usuarios/${idUsuario}`);
         if (respuesta.ok) {
             return await respuesta.json();
         }
@@ -33,7 +33,7 @@ export const createUsuario = async (nuevoUsuario) => {
             },
         };
 
-        const respuesta = await fetch('https://jsonplaceholder.typicode.com/users', opciones);
+        const respuesta = await fetch('http://localhost:3000/usuarios', opciones);
         if (respuesta.ok) {
             return await respuesta.json();
         }
@@ -45,7 +45,7 @@ export const createUsuario = async (nuevoUsuario) => {
 // Actualizar Usuario por ID
 export const updateUsuario = async (usuarioId, usuario) => {
     try {
-        const solicitud = await fetch(`https://jsonplaceholder.typicode.com/users/${usuarioId}`, {
+        const solicitud = await fetch(`http://localhost:3000/usuarios/${usuarioId}`, {
             method: 'PATCH',
             body: JSON.stringify(usuario),
             headers: {
@@ -64,7 +64,7 @@ export const updateUsuario = async (usuarioId, usuario) => {
 // Eliminar el usuario por ID
 export const deleteUsuario = async (usuarioId) => {
     try {
-        const solicitud = await fetch(`https://jsonplaceholder.typicode.com/users/${usuarioId}`, {
+        const solicitud = await fetch(`http://localhost:3000/usuarios/${usuarioId}`, {
             method: 'DELETE',
         });
         return solicitud.ok;
