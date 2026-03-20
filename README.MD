@@ -1,34 +1,63 @@
-Nombres: Michael Stiven Echeverry - Edward Andrey Mantilla - Ximena Quintanilla Rodríguez  
+Nombres: Michael Stiven Echeverry - Edward Andrey Mantilla - Ximena Quintanilla Rodríguez
 
-Proposito del proyecto:
-El propisito en este proyecto que es: 
--procesar la logica del negocio
--Validar informacion
--Gestionar la base de datos 
--Responder solicitudes del cliente (Fronted)
--Garantizar la seguridad y control de acceso 
+# Backend - Sistema de Gestión de Tareas
 
+## Propósito del proyecto
 
-Estructura del proyecto:
-BACKEND_DOM
-├── node_modules/
-├── routes/
-│   ├── rutasTareas.js
-│   └── rutasUsuario.js
+API REST construida con Node.js y Express para gestionar usuarios y tareas.
+Provee los endpoints necesarios para que el frontend pueda:
+- Consultar, crear, actualizar y eliminar tareas
+- Consultar, crear, actualizar y eliminar usuarios
+- Procesar la lógica del negocio
+- Validar información
+- Responder solicitudes del cliente (Frontend)
+
+## Estructura del proyecto
+
+```
+Backend_DOM-Proyecto-XEM/
 ├── src/
-│   ├── routes/
-│   │   ├── rutasTareas.js
-│   │   └── rutasUsuario.js
-│   └── app.js
-├── .env
-├── .gitignore
-├── app.js
-├── package-lock.json
+│   ├── app.js                    # Punto de entrada: configura Express y monta las rutas
+│   ├── controllers/
+│   │   ├── tareasControllers.js  # Lógica de cada endpoint de tareas
+│   │   └── usuarioControllers.js # Lógica de cada endpoint de usuarios
+│   ├── models/
+│   │   ├── tareasModel.js        # Peticiones HTTP hacia la API de datos (tareas)
+│   │   └── usuarioModel.js       # Peticiones HTTP hacia la API de datos (usuarios)
+│   └── routes/
+│       ├── rutasTareas.js        # Define las rutas /tareas
+│       └── rutasUsuario.js       # Define las rutas /usuarios
 ├── package.json
-├── README.MD
-├── rutasTareas.js
-└── rutasUsuario.js
+└── README.md
+```
 
-Como ejecutar el servidor: 
-La dependecia express importa framework los cuales crean una instacia de la aplicación se define el puerto (3000) y finalmente permite escuchar solicitudes.  
+## Cómo ejecutar el servidor
 
+```bash
+npm install
+node src/app.js
+```
+
+El servidor queda disponible en `http://localhost:3000`.
+
+## Endpoints disponibles
+
+### Tareas — `/tareas`
+
+| Método | Ruta        | Descripción              |
+|--------|-------------|--------------------------|
+| GET    | /tareas     | Obtener todas las tareas |
+| GET    | /tareas/:id | Obtener una tarea por ID |
+| POST   | /tareas     | Crear una nueva tarea    |
+| PUT    | /tareas/:id | Actualizar una tarea     |
+| DELETE | /tareas/:id | Eliminar una tarea       |
+
+### Usuarios — `/usuarios`
+
+| Método | Ruta          | Descripción                |
+|--------|---------------|----------------------------|
+| GET    | /usuarios     | Obtener todos los usuarios |
+| GET    | /usuarios/:id | Obtener un usuario por ID  |
+| POST   | /usuarios     | Crear un nuevo usuario     |
+| PUT    | /usuarios/:id | Actualizar un usuario      |
+| DELETE | /usuarios/:id | Eliminar un usuario        |
