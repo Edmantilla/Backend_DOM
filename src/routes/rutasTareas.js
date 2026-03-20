@@ -1,15 +1,12 @@
 import express from 'express';
-const app = express();
-const port = 3000; 
+import { getTareas, getTareasById, createTarea, updateTarea, deleteTarea } from '../controllers/tareasControllers.js';
 
-app.get('/tareas', (req, res) => {
-    res.json(
-        {mensaje: "Las tareas se listarán"}
-    )
-})
+const tareasRouter = express.Router();
 
-app.post('/tareas', (req, res) => {
-    res.json(
-        {mensaje: "Creando tareas"}
-    )
-})
+tareasRouter.get('/', getTareas);
+tareasRouter.get('/:id', getTareasById);
+tareasRouter.post('/', createTarea);
+tareasRouter.put('/:id', updateTarea);
+tareasRouter.delete('/:id', deleteTarea);
+
+export default tareasRouter;
