@@ -3,22 +3,22 @@ import tareasRouter from './routes/rutasTareas.js';
 import usuariosRouter from './routes/rutasUsuario.js';
 
 const app = express();
-const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.sendStatus(200);
-    next();
+// Ruta raíz
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "Bienvenido a la API de Gestión de Tareas",
+        data: [],
+        errors: [],
+    });
 });
 
+// Rutas
 app.use('/tareas', tareasRouter);
 app.use('/usuarios', usuariosRouter);
 
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+export default app;
