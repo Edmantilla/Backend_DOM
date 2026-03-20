@@ -1,55 +1,105 @@
 import { usuariosModel } from "../models/usuarioModel.js";
 
-export const getUsuarios = async (req, res) => {
-    try {
-        const usuarios = usuariosModel.findAll();
-        res.status(200).json({ mensaje: "Lista de Usuarios", data: usuarios });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al obtener los usuarios", error: error.message });
-    }
+export const getUsuarios = (req, res) => {
+    const usuarios = usuariosModel.findAll();
+    res.status(200).json({
+        success: true,
+        message: "Lista de usuarios",
+        data: usuarios,
+        errors: [],
+    });
 };
 
-export const getUsuarioById = async (req, res) => {
+export const getUsuarioById = (req, res) => {
     try {
         const { id } = req.params;
-        const usuario = usuariosModel.findById(parseInt(id));
-        res.status(200).json({ mensaje: `El usuario con ID: ${id} consultado correctamente`, data: usuario });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al obtener el usuario", error: error.message });
-    }
-};
-
-export const createUsuario = async (req, res) => {
-    try {
-        const { name, username, email, ciudad, genero } = req.body;
-        const usuario = usuariosModel.create({ name, username, email, ciudad, genero });
-        res.status(201).json({ mensaje: "El usuario fue creado correctamente", data: usuario });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al crear el usuario", error: error.message });
-    }
-};
-
-export const updateUsuario = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, username, email, ciudad, genero } = req.body;
-        const usuario = usuariosModel.update(parseInt(id), { name, username, email, ciudad, genero });
-        res.status(200).json({ mensaje: `El usuario con el ID: ${id} fue actualizado correctamente`, data: usuario });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al actualizar el usuario", error: error.message });
-    }
-};
-
-export const deleteUsuario = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const eliminado = usuariosModel.delete(parseInt(id));
-        if (eliminado) {
-            res.status(200).json({ mensaje: `El usuario con el ID: ${id} fue eliminado correctamente`, data: [{ id }] });
-        } else {
-            res.status(404).json({ mensaje: `No se encontró el usuario con ID: ${id}` });
+        const usuario = usuariosModel.findById(Number(id));
+        if (!usuario) {
+            return res.status(404).json({
+                success: false,
+                message: `Usuario con ID ${id} no encontrado`,
+                data: [],
+                errors: [],
+            });
         }
+        res.status(200).json({
+            success: true,
+            message: "Usuario encontrado correctamente",
+            data: usuario,
+            errors: [],
+        });
     } catch (error) {
-        res.status(500).json({ mensaje: "Error al eliminar el usuario", error: error.message });
+        res.status(500).json({
+            success: false,
+            message: "Error al procesar la búsqueda",
+            data: [],
+            errors: [],
+        });
+    }
+};
+
+export const createUsuario = (req, res) => {
+    const { name, username, email, ciudad, genero } = req.body;
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            message: "El nombre es obligatorio",
+            data: [],
+            errors: [],
+        });
+    }
+    const usuario = usuariosModel.create({ name, username, email, ciudad, genero });
+    res.status(201).json({
+        success: true,
+        message: "Usuario creado correctamente",
+        data: usuario,
+        errors: [],
+    });
+};
+
+export const updateUsuario = (req, res) => {
+    const { id } = req.params;
+    const usuario = usuariosModel.update(Number(id), req.body);
+    if (!usuario) {
+        return res.status(404).json({
+            success: false,
+            message: `Usuario con ID ${id} no encontrado`,
+            data: [],
+            errors: [],
+        });
+    }
+    res.status(200).json({
+        success: true,
+        message: "Usuario actualizado correctamente",
+        data: usuario,
+        errors: [],
+    });
+};
+
+export const deleteUsuario = (req, res) => {
+    try {
+        const { id } = req.params;
+        const eliminado = usuariosModel.delete(Number(id));
+        if (!eliminado) {
+            return res.status(404).json({
+                success: false,
+                message: `No se puede eliminar: Usuario con ID ${id} no encontrado`,
+                data: [],
+                errors: [],
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: `Usuario con ID ${id} eliminado correctamente`,
+            data: [],
+            errors: [],
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error al intentar eliminar el usuario",
+            data: [],
+            errors: [],
+        });
     }
 };

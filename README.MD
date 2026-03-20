@@ -17,30 +17,39 @@ Provee los endpoints necesarios para que el frontend pueda:
 ```
 Backend_DOM-Proyecto-XEM/
 ├── src/
-│   ├── app.js                    # Punto de entrada: configura Express y monta las rutas
+│   ├── app.js                    # Configura Express y exporta la app
+│   ├── data/
+│   │   ├── tareas.data.js        # Datos de prueba de tareas
+│   │   └── usuarios.data.js      # Datos de prueba de usuarios
+│   ├── models/
+│   │   ├── tareasModel.js        # findAll, findById, create, update, delete
+│   │   └── usuarioModel.js       # findAll, findById, create, update, delete
 │   ├── controllers/
 │   │   ├── tareasControllers.js  # Lógica de cada endpoint de tareas
 │   │   └── usuarioControllers.js # Lógica de cada endpoint de usuarios
-│   ├── models/
-│   │   ├── tareasModel.js        # Peticiones HTTP hacia la API de datos (tareas)
-│   │   └── usuarioModel.js       # Peticiones HTTP hacia la API de datos (usuarios)
 │   └── routes/
 │       ├── rutasTareas.js        # Define las rutas /tareas
 │       └── rutasUsuario.js       # Define las rutas /usuarios
+├── index.js                      # Punto de entrada, inicia el servidor
 ├── package.json
-└── README.md
+└── README.MD
 ```
 
 ## Cómo ejecutar el servidor
 
 ```bash
 npm install
-node src/app.js
+node index.js
 ```
 
 El servidor queda disponible en `http://localhost:3000`.
 
 ## Endpoints disponibles
+
+### Raíz
+| Método | Ruta | Descripción      |
+|--------|------|------------------|
+| GET    | /    | Saludo de la API |
 
 ### Tareas — `/tareas`
 
@@ -61,3 +70,16 @@ El servidor queda disponible en `http://localhost:3000`.
 | POST   | /usuarios     | Crear un nuevo usuario     |
 | PUT    | /usuarios/:id | Actualizar un usuario      |
 | DELETE | /usuarios/:id | Eliminar un usuario        |
+
+## Formato de respuesta
+
+Todas las respuestas siguen este formato:
+
+```json
+{
+  "success": true,
+  "message": "Descripción del resultado",
+  "data": [],
+  "errors": []
+}
+```
