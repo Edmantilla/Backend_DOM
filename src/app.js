@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
     res.status(200).json({
         success: true,
-        message: "Saludo de la API",
+        message: "Saludo de la API ",
         data: [],
         errors: [],
     });
