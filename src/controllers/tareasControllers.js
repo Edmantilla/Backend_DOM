@@ -1,50 +1,105 @@
-import { getAllTareas, getByIdTarea, createTarea, updateTarea, deleteTarea } from "../models/tareasModel.js";
+import { tareasModel } from "../models/tareasModel.js";
 
-export const getTareas = async (req, res) => {
-    const tareas = await getAllTareas();
+export const getTareas = (req, res) => {
+    const tareas = tareasModel.findAll();
     res.status(200).json({
-        mensaje: "Lista de Tareas",
-        data: tareas
+        success: true,
+        message: "Lista de tareas",
+        data: tareas,
+        errors: [],
     });
 };
 
-export const getTareasById = async (req, res) => {
-    const {id} = req.params;
-    const tarea = await getByIdTarea(id);
-    res.status(200).json({
-        mensaje: `La tarea con ID: ${id} consultada correctamente`,
-        data: tarea
-    });
-};
-
-export const createTarea = async (req, res) => {
-    const {titulo, descripcion, estado} = req.body;
-    const tarea = await createTarea(titulo, descripcion, estado);
-    res.status(201).json({
-        mensaje: `La tarea fue creada correctamente`,
-        data: tarea
-    });
-};
-
-export const updateTarea = async (req, res) => {
-    const {id} = req.params;
-    const {titulo, descripcion, estado} = req.body;
-    const tarea = await updateTarea(titulo, descripcion, estado);
-    res.status(200).json({
-        mensaje: `La tarea con el ID: ${id} fue actualizado correctamente`,
-        data: tarea
-    });
-};
-
-export const deleteTarea = async (req, res) => {
-    const {id} = req.params;
-    const eliminado = await deleteTarea(id);
-    if (eliminado){
+export const getTareasById = (req, res) => {
+    try {
+        const { id } = req.params;
+        const tarea = tareasModel.findById(Number(id));
+        if (!tarea) {
+            return res.status(404).json({
+                success: false,
+                message: `Tarea con ID ${id} no encontrada`,
+                data: [],
+                errors: [],
+            });
+        }
         res.status(200).json({
-            mensaje: `La tarea con el ID: ${id} fue eliminada correctamente`,
-            data: [{
-                id: id
-            }]
+            success: true,
+            message: "Tarea encontrada correctamente",
+            data: tarea,
+            errors: [],
         });
-    };
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error al procesar la búsqueda",
+            data: [],
+            errors: [],
+        });
+    }
+};
+
+export const createTarea = (req, res) => {
+    const { titulo, descripcion, estado } = req.body;
+    if (!titulo) {
+        return res.status(400).json({
+            success: false,
+            message: "El título es obligatorio",
+            data: [],
+            errors: [],
+        });
+    }
+    const tarea = tareasModel.create({ titulo, descripcion, estado });
+    res.status(201).json({
+        success: true,
+        message: "Tarea creada correctamente",
+        data: tarea,
+        errors: [],
+    });
+};
+
+export const updateTarea = (req, res) => {
+    const { id } = req.params;
+    const tarea = tareasModel.update(Number(id), req.body);
+    if (!tarea) {
+        return res.status(404).json({
+            success: false,
+            message: `Tarea con ID ${id} no encontrada`,
+            data: [],
+            errors: [],
+        });
+    }
+    res.status(200).json({
+        success: true,
+        message: "Tarea actualizada correctamente",
+        data: tarea,
+        errors: [],
+    });
+};
+
+export const deleteTarea = (req, res) => {
+    try {
+        const { id } = req.params;
+        const eliminado = tareasModel.delete(Number(id));
+        if (!eliminado) {
+            return res.status(404).json({
+                success: false,
+                message: `No se puede eliminar: Tarea con ID ${id} no encontrada`,
+                data: [],
+                errors: [],
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: `Tarea con ID ${id} eliminada correctamente`,
+            data: [],
+            errors: [],
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error al intentar eliminar la tarea",
+            data: [],
+            errors: [],
+        });
+    }
 };

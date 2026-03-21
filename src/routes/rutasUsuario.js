@@ -1,15 +1,12 @@
-import express from 'express';
-const app = express();
-const port = 3000; 
+import { Router } from "express";
+import { getUsuarios, getUsuarioById, createUsuario, updateUsuario, deleteUsuario } from "../controllers/usuarioControllers.js";
 
-app.get('/usuarios', (req, res) => {
-    res.json(
-        {mensaje: "Los usuarios se listarán"}
-    )
-})
+const usuariosRouter = Router();
 
-app.post('/usuarios', (req, res) => {
-    res.json(
-        {mensaje: "Creando usuario"}
-    )
-})
+usuariosRouter.get("/", getUsuarios);
+usuariosRouter.get("/:id", getUsuarioById);
+usuariosRouter.post("/", createUsuario);
+usuariosRouter.put("/:id", updateUsuario);
+usuariosRouter.delete("/:id", deleteUsuario);
+
+export default usuariosRouter;
