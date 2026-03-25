@@ -38,6 +38,26 @@ export const getTareasById = (req, res) => {
     }
 };
 
+export const getTareasByUserId = (req, res) => {
+    try {
+        const { userId } = req.params;
+        const tareas = tareasModel.findByUserId(Number(userId));
+        res.status(200).json({
+            success: true,
+            message: `Tareas del usuario con ID ${userId}`,
+            data: tareas,
+            errors: [],
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error al obtener las tareas del usuario",
+            data: [],
+            errors: [],
+        });
+    }
+};
+
 export const createTarea = (req, res) => {
     const { titulo, descripcion, estado } = req.body;
     if (!titulo) {
