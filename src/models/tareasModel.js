@@ -10,6 +10,10 @@ export const tareasModel = {
         return tareasData.find(t => t.id === id);
     },
 
+    findByUserId: (userId) => {
+        return tareasData.filter(t => t.userId === userId);
+    },
+
     create: (nuevaTarea) => {
         const id = tareasData.length + 1;
         const tarea = { id, ...nuevaTarea };

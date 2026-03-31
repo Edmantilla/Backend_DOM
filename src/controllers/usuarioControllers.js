@@ -39,6 +39,7 @@ export const getUsuarioById = (req, res) => {
 };
 
 export const createUsuario = (req, res) => {
+    console.log("Recibida petición para crear usuario:", req.body);
     const { name, username, email, ciudad, genero } = req.body;
     if (!name) {
         return res.status(400).json({
