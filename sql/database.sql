@@ -33,6 +33,5 @@ create table tasks (
     updated_up timestamp default current_timestamp on update current_timestamp,
     constraint fk_tasks_users
     foreign key (userId) references users(id)
-    on delete restrict
-    on update cascade
+    on delete restrict on update cascade
 );
