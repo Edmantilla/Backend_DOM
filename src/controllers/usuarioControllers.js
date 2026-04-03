@@ -1,4 +1,5 @@
 import { usuariosModel } from "../models/usuarioModel.js";                      // Importa el modelo de usuarios para acceder a los métodos de la BD
+import { tareasModel } from "../models/tareasModel.js";                         // Importa el modelo de tareas para verificar si el usuario tiene tareas asignadas
 
 export const getUsuarios = async (req, res) => {                                // Controlador para obtener todos los usuarios — async porque hace operaciones con la BD
     try {
@@ -115,7 +116,19 @@ export const deleteUsuario = async (req, res) => {                              
                 errors: [],
             });
         }
-        const isDeleted = await usuariosModel.delete(Number(id));                           // Solo llega aquí si el usuario existe — ejecuta el DELETE en la BD
+
+        // Verifica si el usuario tiene tareas asignadas en la tabla task_users
+        const tareasAsignadas = await tareasModel.findByUserId(Number(id));
+        if (tareasAsignadas.length > 0) {                                                   // Si tiene tareas, no se puede eliminar
+            return res.status(400).json({
+                success: false,
+                message: `No se puede eliminar el usuario "${usuarioExists.name}" porque tiene ${tareasAsignadas.length} tarea(s) asignada(s). Primero reasigna o elimina esas tareas.`,
+                data: [],
+                errors: [],
+            });
+        }
+
+        const isDeleted = await usuariosModel.delete(Number(id));                           // Solo llega aquí si el usuario existe y no tiene tareas — ejecuta el DELETE en la BD
         res.status(200).json({                                                              // Eliminación exitosa
             success: true,
             message: "Usuario eliminado correctamente",
