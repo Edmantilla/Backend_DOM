@@ -8,30 +8,47 @@
     grant all privileges on proyecto_adso_2994281.* to 'xem_user'@'localhost';
     -- Aplica los cambios de permisos
     flush privileges;
-    -- Aplica los cambios de permisos
+    -- Selecciona la base de datos para comenzar a trabajar en ella
     use proyecto_adso_2994281;
 
--- Se crea la tabla de usuarios
+-- Crea la tabla de usuarios
+-- Esta tabla almacena la información básica de cada usuario del sistema
 create table users (
-    id int auto_increment primary key,
-    name varchar(100) not null,
-    username varchar(100) not null unique,
-    email varchar(250) not null unique,
-    telefono varchar(20) not null,
-    created_up timestamp default current_timestamp,
-    updated_up timestamp default current_timestamp on update current_timestamp
+id int auto_increment primary key,
+name varchar(100) not null,
+username varchar(100) not null unique,
+email varchar(250) not null unique,
+telefono varchar(20) not null,
+created_up timestamp default current_timestamp,
+updated_up timestamp default current_timestamp on update current_timestamp
 );
 
--- Se crea la tabla de tareas
+-- Crea la tabla de tareas
+-- Aquí se almacenan todas las tareas del sistema
 create table tasks (
-    id int auto_increment primary key,
-    userId int not null,
-    titulo varchar(250) not null,
-    descripcion text, 
-    estado enum("completada", "en proceso", "pendiente") default "pendiente",
-    created_up timestamp default current_timestamp,
-    updated_up timestamp default current_timestamp on update current_timestamp,
-    constraint fk_tasks_users
-    foreign key (userId) references users(id)
-    on delete restrict on update cascade
+id int auto_increment primary key,
+titulo varchar(250) not null,
+descripcion text, 
+estado enum("completada", "en proceso", "pendiente") default "pendiente",
+created_up timestamp default current_timestamp,
+updated_up timestamp default current_timestamp on update current_timestamp
 );
+
+-- Crea la tabla intermedia para la relación muchos a muchos
+-- Un usuario puede tener varias tareas y una tarea puede tener varios usuarios
+create table task_users (
+id int auto_increment primary key,
+taskId int not null,
+userId int not null,
+created_up timestamp default current_timestamp,
+updated_up timestamp default current_timestamp on update current_timestamp,
+
+constraint fk_task_users_task
+foreign key (taskId) references tasks(id)
+on delete restrict
+on update cascade,
+
+constraint fk_task_users_user
+foreign key (userId) references users(id)
+on delete restrict
+on update cascade);

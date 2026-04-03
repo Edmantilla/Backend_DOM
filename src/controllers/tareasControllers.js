@@ -79,35 +79,42 @@ export const getTareasByUserId = async (req, res) => {                          
 
 export const createTarea = async (req, res) => {                                                        // Controlador para crear una nueva tarea
     try {
-        const { titulo, descripcion, estado, userId } = req.body;                                       // Destructura los campos del body — todos definidos en el esquema SQL de tasks
-        if (!titulo || !userId) {                                                                       // Valida los campos NOT NULL obligatorios: titulo y userId (FK)
-            return res.status(400).json({                                                               // HTTP 400 — el cliente no envió los datos mínimos requeridos
+        const { titulo, descripcion, estado, userIds } = req.body;                                      // userIds es un arreglo de IDs — muchos usuarios pueden estar asignados a una tarea
+
+        // Valida que vengan los campos mínimos: título y al menos un usuario
+        if (!titulo || !userIds || !Array.isArray(userIds) || userIds.length === 0) {
+            return res.status(400).json({
                 success: false,
-                message: "El título y el ID de usuario (userId) son obligatorios",
+                message: "El título y al menos un usuario son obligatorios",
                 data: [],
                 errors: [],
             });
         }
-        const usuarioExists = await usuariosModel.findById(Number(userId));                             // Verifica que el userId enviado exista en la tabla users
-        if (!usuarioExists) {                                                                           // Si el userId no existe, MySQL lanzaría un error de FK
-            return res.status(404).json({
-                success: false,
-                message: `No se puede crear la tarea: Usuario con ID ${userId} no encontrado`,
-                data: [],
-                errors: [],
-            });
+
+        // Verifica que cada userId del arreglo exista en la tabla users antes de insertar
+        for (const userId of userIds) {
+            const usuarioExists = await usuariosModel.findById(Number(userId));
+            if (!usuarioExists) {
+                return res.status(404).json({
+                    success: false,
+                    message: `No se puede crear la tarea: Usuario con ID ${userId} no encontrado`,
+                    data: [],
+                    errors: [],
+                });
+            }
         }
-        const newTarea = await tareasModel.create({ titulo, descripcion, estado, userId });             /* Todos los datos son válidos — inserta la nueva tarea en la BD */
+
+        const newTarea = await tareasModel.create({ titulo, descripcion, estado, userIds: userIds.map(Number) });   // Crea la tarea y sus relaciones en task_users
         res.status(201).json({                                                                          // HTTP 201 (Created) — tarea creada exitosamente
             success: true,
             message: "Tarea creada correctamente",
-            data: newTarea,                                                                             // Retorna la tarea creada con su ID generado por auto_increment
+            data: newTarea,                                                                             // Retorna la tarea con su arreglo de usuarios asignados
             errors: [],
         });
-    } catch (error) {                                                                                   // Captura errores residuales de la BD (ej: violación de constraint no prevista)
+    } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Error interno al crear la tarea. Verifique que el usuario exista.",
+            message: "Error interno al crear la tarea",
             data: [],
             errors: [error.message],
         });
@@ -117,6 +124,30 @@ export const createTarea = async (req, res) => {                                
 export const updateTarea = async (req, res) => {                                                        // Controlador para actualizar los datos de una tarea existente
     try {
         const { id } = req.params;                                                                      // Obtiene el ID de la tarea a actualizar desde la URL
+
+        // Si se enviaron userIds, valida que sean un arreglo y que cada usuario exista
+        if (req.body.userIds !== undefined) {
+            if (!Array.isArray(req.body.userIds)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "El campo userIds debe ser una lista de IDs de usuarios, por ejemplo: [1, 2, 3]",
+                    data: [],
+                    errors: [],
+                });
+            }
+            for (const userId of req.body.userIds) {
+                const usuarioExists = await usuariosModel.findById(Number(userId));
+                if (!usuarioExists) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `No se puede actualizar: Usuario con ID ${userId} no encontrado`,
+                        data: [],
+                        errors: [],
+                    });
+                }
+            }
+        }
+
         const updatedTarea = await tareasModel.update(Number(id), req.body);                            // Pasa el ID y los nuevos datos del body al modelo para ejecutar el UPDATE
         if (!updatedTarea) {                                                                            // El modelo retorna null si no encontró la tarea con ese ID
             return res.status(404).json({
@@ -129,7 +160,7 @@ export const updateTarea = async (req, res) => {                                
         res.status(200).json({                                                                          // Actualización exitosa
             success: true,
             message: "Tarea actualizada correctamente",
-            data: updatedTarea,                                                                         // Retorna la tarea con los nuevos valores ya guardados
+            data: updatedTarea,                                                                         // Retorna la tarea con los nuevos valores y usuarios asignados
             errors: [],
         });
     } catch (error) {

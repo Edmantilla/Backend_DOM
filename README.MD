@@ -83,7 +83,8 @@ Abre MySQL Workbench, copia y pega el contenido del archivo `sql/database.sql` y
 - Crea el usuario `xem_user` con su contraseña
 - Otorga todos los privilegios al usuario sobre la base de datos
 - Crea la tabla `users` con los campos: `id`, `name`, `username`, `email`, `telefono`, `created_up`, `updated_up`
-- Crea la tabla `tasks` con los campos: `id`, `userId` (FK), `titulo`, `descripcion`, `estado`, `created_up`, `updated_up`
+- Crea la tabla `tasks` con los campos: `id`, `titulo`, `descripcion`, `estado`, `created_up`, `updated_up`
+- Crea la tabla `task_users` (tabla intermedia) que relaciona tareas y usuarios en una relación **muchos a muchos**: un usuario puede tener varias tareas y una tarea puede tener varios usuarios asignados
 
 ### 3. (Opcional) Insertar datos de prueba
 
@@ -178,14 +179,28 @@ Respuesta esperada:
   "titulo": "Nombre de la tarea",
   "descripcion": "Descripción opcional",
   "estado": "pendiente",
-  "userId": 1
+  "userIds": [1, 2]
 }
 ```
 
 - `titulo` — obligatorio
-- `userId` — obligatorio (debe existir en la tabla `users`)
+- `userIds` — obligatorio, arreglo con los IDs de los usuarios a asignar (deben existir en la tabla `users`). Permite asignar uno o varios usuarios a la misma tarea
 - `descripcion` — opcional
 - `estado` — opcional, valores aceptados: `"pendiente"`, `"en proceso"`, `"completada"` (por defecto `"pendiente"`)
+
+### PUT /tareas/:id — Actualizar tarea
+
+```json
+{
+  "titulo": "Nuevo nombre",
+  "descripcion": "Nueva descripción",
+  "estado": "en proceso",
+  "userIds": [1, 3]
+}
+```
+
+- Si se envía `userIds`, reemplaza completamente los usuarios asignados a esa tarea
+- Si no se envía `userIds`, los usuarios asignados no cambian
 
 ### POST /usuarios — Crear usuario
 
